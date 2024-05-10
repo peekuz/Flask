@@ -2,7 +2,7 @@ import os
 from flask import Flask, flash, request, redirect, render_template
 
 UPLOAD_FOLDER = "./uploads"
-ALLOWED_EXTENSIONS = {".mp4"}
+ALLOWED_EXTENSIONS = {"mp4"}
 CHUNK_SIZE = 1024 * 20
 
 app = Flask(__name__)
@@ -58,11 +58,11 @@ def upload_file():
         create_folder_if_not_exist()
         files = request.files.getlist("file")
         for file in files:
-            filename = convert_to_mpd(file.filename)
-            new_path = os.path.join("uploads", filename)
-            if check_file_exist(new_path):
-                continue
             if file and allowed_file(file.filename):
+                new_file_name = convert_to_mpd(file.filename)
+                new_path = os.path.join("uploads", new_file_name)
+                if check_file_exist(new_path):
+                    continue
                 bytes_left = get_file_size(file)
                 with open(new_path, "wb") as upload:
                     chunk_size = CHUNK_SIZE
@@ -72,6 +72,6 @@ def upload_file():
                         chunk = file.stream.read(chunk_size)
                         upload.write(chunk)
                         bytes_left -= len(chunk)
-                        print(bytes_left)
+
         return "<h1>Files Uploaded Successfully.!</h1>"
     return render_template("upload.html")
