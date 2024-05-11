@@ -2,14 +2,36 @@ import os
 from flask import Flask, flash, request, redirect, render_template
 
 UPLOAD_FOLDER = "./uploads"
-ALLOWED_EXTENSIONS = {"mp4","webm","mkv","flv","vob","ogv","ogg","rrc","gifv","mng","mov","avi","qt","wmv","yuv","rm","asf","amv","m4p","m4v","mpg","mp2","mpeg"}
+ALLOWED_EXTENSIONS = {
+    "mp4",
+    "webm",
+    "mkv",
+    "flv",
+    "vob",
+    "ogv",
+    "ogg",
+    "rrc",
+    "gifv",
+    "mng",
+    "mov",
+    "avi",
+    "qt",
+    "wmv",
+    "yuv",
+    "rm",
+    "asf",
+    "amv",
+    "m4p",
+    "m4v",
+    "mpg",
+    "mp2",
+    "mpeg",
+}
 CHUNK_SIZE = 1024 * 20
 
 app = Flask(__name__)
-app.config.from_mapping(
-    SECRET_KEY= b'_5#y2L"F4Q8z\n\xec]/',
-    UPLOAD_FOLDER = UPLOAD_FOLDER
-)
+app.config.from_mapping(SECRET_KEY=b'_5#y2L"F4Q8z\n\xec]/', UPLOAD_FOLDER=UPLOAD_FOLDER)
+
 
 def allowed_file(filename):
     """this method will allow only predefined extension."""
@@ -44,6 +66,7 @@ def get_file_size(file):
     file.seek(0, 0)
     return bytes_left
 
+
 @app.route("/upload", methods=["GET", "POST"])
 def upload_file():
     """This method will upload files as a chunk."""
@@ -57,21 +80,23 @@ def upload_file():
             return redirect(request.url)
         create_folder_if_not_exist()
         files = request.files.getlist("file")
+        chunk_size = CHUNK_SIZE
         for file in files:
             if file and allowed_file(file.filename):
                 new_file_name = convert_to_mpd(file.filename)
-                new_path = os.path.join("uploads", new_file_name)
+                new_path = os.path.join(UPLOAD_FOLDER, new_file_name)
                 if check_file_exist(new_path):
                     continue
                 bytes_left = get_file_size(file)
-                with open(new_path, "wb") as upload:
-                    chunk_size = CHUNK_SIZE
-                    if chunk_size > bytes_left:
-                        chunk_size = bytes_left
-                    while bytes_left > 0:
-                        chunk = file.stream.read(chunk_size)
-                        upload.write(chunk)
-                        bytes_left -= len(chunk)
-
+                try:
+                    with open(new_path, "wb") as upload:
+                        chunk_size = min(chunk_size, bytes_left)
+                        while bytes_left > 0:
+                            chunk = file.stream.read(chunk_size)
+                            upload.write(chunk)
+                            bytes_left -= len(chunk)
+                except OSError as e:
+                    print(f"last executed file{new_file_name}")
+                    print(f"An error occurred while writing to the file: {e}")
         return "<h1>Files Uploaded Successfully.!</h1>"
     return render_template("upload.html")
