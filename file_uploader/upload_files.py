@@ -3,29 +3,8 @@ from flask import Flask, flash, request, redirect, render_template
 
 UPLOAD_FOLDER = "./uploads"
 ALLOWED_EXTENSIONS = {
-    "mp4",
-    "webm",
-    "mkv",
-    "flv",
-    "vob",
-    "ogv",
-    "ogg",
-    "rrc",
-    "gifv",
-    "mng",
-    "mov",
-    "avi",
-    "qt",
-    "wmv",
-    "yuv",
-    "rm",
-    "asf",
-    "amv",
-    "m4p",
-    "m4v",
-    "mpg",
-    "mp2",
-    "mpeg",
+    "mp4", "webm", "mkv", "flv", "vob", "ogv", "ogg", "rrc", "gifv", "mpg", "mp2",
+    "mng", "mov", "avi", "qt", "wmv", "yuv", "rm", "asf", "amv", "m4p", "m4v", "mpeg"
 }
 CHUNK_SIZE = 1024 * 20
 
